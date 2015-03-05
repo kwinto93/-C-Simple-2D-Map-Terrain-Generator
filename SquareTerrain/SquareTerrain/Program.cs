@@ -12,21 +12,24 @@ namespace SquareTerrain
     class Program
     {
         private static RenderWindow _mainWindow;
-        private static DrawingController _drawingManager;
+        private static DrawingTileMapController _drawingTileMapManager;
+
+        public const int WINDOW_WIDTH = 800;
+        public const int WINDOW_HEIGHT = 600;
 
         static void Main(string[] args)
         {
-            _mainWindow = new RenderWindow(new VideoMode(800,600), "Square terrain generator");
+            _mainWindow = new RenderWindow(new VideoMode(800,600), "Square Tiles terrain generator");
             _mainWindow.Closed += mainWindow_Closed;
 
-            _drawingManager = new DrawingController(_mainWindow);
+            _drawingTileMapManager = new DrawingTileMapController();
 
             while (_mainWindow.IsOpen())
             {
                 _mainWindow.DispatchEvents();
 
                 _mainWindow.Clear(Color.Black);
-                _drawingManager.Draw();
+                _mainWindow.Draw(_drawingTileMapManager);
                 _mainWindow.Display();
             }
         }
