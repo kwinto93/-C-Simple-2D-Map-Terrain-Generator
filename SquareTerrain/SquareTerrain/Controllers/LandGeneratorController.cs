@@ -49,6 +49,29 @@ namespace SquareTerrain.Controllers
             return Math.Pow(1f / (distanceFromSource / 100f * DistanceFromSourceLandBlockImpact + 1f), LandGenerationPower);
         }
 
+        private void ShuffleBlock(int source, int destination, ref MapBlock[] randomBlockList)
+        {
+            MapBlock tmp = randomBlockList[source];
+            randomBlockList[source] = randomBlockList[destination];
+            randomBlockList[destination] = tmp;
+        }
+
+        private void ShufflingNearBlock(List<MapBlock> nearBlocks, out MapBlock[] randomBlockList)
+        {
+            Random rand = new Random(DateTime.Now.Millisecond);
+            randomBlockList = new MapBlock[8];
+
+            for (int i = 0; i < nearBlocks.Count; i++)
+            {
+                randomBlockList[i] = nearBlocks[i];
+            }
+
+            for (int i = 0; i < randomBlockList.Length; i++)
+            {
+                ShuffleBlock(rand.Next(8), rand.Next(8), ref randomBlockList);
+            }
+        }
+
         private void PutNextLandBlocks(MapBlock sourceLandBlock, Random rand, int distance)
         {
             if (distance < _maxLandSquareBoundSize && sourceLandBlock.BlockType.Equals(BlockTypesEnum.Types.Land))
@@ -56,12 +79,15 @@ namespace SquareTerrain.Controllers
                 _visited[sourceLandBlock.X, sourceLandBlock.Y] = 1; // visited
                 double currentLandGenerationProbality = ProbabilityFunction(distance);
 
-                foreach (var nearBlock in sourceLandBlock.NearBlocks)
+                MapBlock[] randomNearBlockList;
+                ShufflingNearBlock(sourceLandBlock.NearBlocks, out randomNearBlockList);
+
+                for(int i = 0; i<randomNearBlockList.Length; i++)
                 {
-                    if (nearBlock != null && _visited[nearBlock.X, nearBlock.Y] == 0 && rand.Next(100) < currentLandGenerationProbality * 100)
+                    if (randomNearBlockList[i] != null && _visited[randomNearBlockList[i].X, randomNearBlockList[i].Y] == 0 && rand.Next(100) < currentLandGenerationProbality * 100)
                     {
-                        nearBlock.BlockType = BlockTypesEnum.Types.Land;
-                        PutNextLandBlocks(nearBlock, rand, ++distance); // only land blocks can generate next land block
+                        randomNearBlockList[i].BlockType = BlockTypesEnum.Types.Land;
+                        PutNextLandBlocks(randomNearBlockList[i], rand, ++distance); // only land blocks can generate next land block
                     }
                 }
             }
