@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 using SFML.Graphics;
 using SFML.Window;
 using SquareTerrain.Controllers;
+using SquareTerrain.Models;
 
 namespace SquareTerrain
 {
     class Program
     {
+        private static MapBlock[,] _tileMap;
         private static RenderWindow _mainWindow;
         private static DrawingTileMapController _drawingTileMapManager;
 
@@ -19,10 +21,15 @@ namespace SquareTerrain
 
         static void Main(string[] args)
         {
+            _tileMap = TileMapGeneratorController.GenerateTileMap();
+
+            LandGeneratorController landGenerator = new LandGeneratorController(ref _tileMap, 3);
+            landGenerator.GenerateLand();
+
             _mainWindow = new RenderWindow(new VideoMode(800,600), "Square Tiles terrain generator");
             _mainWindow.Closed += mainWindow_Closed;
 
-            _drawingTileMapManager = new DrawingTileMapController();
+            _drawingTileMapManager = new DrawingTileMapController(ref _tileMap);
 
             while (_mainWindow.IsOpen())
             {
