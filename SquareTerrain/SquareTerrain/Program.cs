@@ -31,7 +31,7 @@ namespace SquareTerrain
 
             _drawingTileMapManager = new DrawingTileMapController(ref _tileMap);
 
-            while (_mainWindow.IsOpen())
+            while (_mainWindow.IsOpen)
             {
                 _mainWindow.DispatchEvents();
 

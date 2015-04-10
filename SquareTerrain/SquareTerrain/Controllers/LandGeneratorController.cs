@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using SFML.Window;
+using SFML.System;
 using SquareTerrain.Enums;
 using SquareTerrain.Models;
 
@@ -12,18 +8,10 @@ namespace SquareTerrain.Controllers
 {
     public class LandGeneratorController
     {
-        private MapBlock[,] _map;
-        private List<GeneratedLandBlock> _landSources;
+        private readonly List<GeneratedLandBlock> _landSources;
+        private readonly MapBlock[,] _map;
+        private readonly int[,] _visited;
         private int _maxLandSquareBoundSize;
-        private int[,] _visited;
-
-        public float LandSourcePointsDensity { get; set; }
-
-        public float DistanceFromSourceLandBlockImpact { get; set; }
-
-        public double LandGenerationPower { get; set; }
-
-        public Vector2i MinMaxLandSize { get; set; }
 
         public LandGeneratorController(ref MapBlock[,] map)
         {
@@ -44,29 +32,34 @@ namespace SquareTerrain.Controllers
             MinMaxLandSize = new Vector2i(40, 300);
         }
 
+        public float LandSourcePointsDensity { get; set; }
+        public float DistanceFromSourceLandBlockImpact { get; set; }
+        public double LandGenerationPower { get; set; }
+        public Vector2i MinMaxLandSize { get; set; }
+
         private double ProbabilityFunction(int distanceFromSource)
         {
-            return Math.Pow(1f / (distanceFromSource / 100f * DistanceFromSourceLandBlockImpact + 1f), LandGenerationPower);
+            return Math.Pow(1f/(distanceFromSource/100f*DistanceFromSourceLandBlockImpact + 1f), LandGenerationPower);
         }
 
         private void ShuffleBlock(int source, int destination, ref MapBlock[] randomBlockList)
         {
-            MapBlock tmp = randomBlockList[source];
+            var tmp = randomBlockList[source];
             randomBlockList[source] = randomBlockList[destination];
             randomBlockList[destination] = tmp;
         }
 
         private void ShufflingNearBlock(List<MapBlock> nearBlocks, out MapBlock[] randomBlockList)
         {
-            Random rand = new Random(DateTime.Now.Millisecond);
+            var rand = new Random(DateTime.Now.Millisecond);
             randomBlockList = new MapBlock[8];
 
-            for (int i = 0; i < nearBlocks.Count; i++)
+            for (var i = 0; i < nearBlocks.Count; i++)
             {
                 randomBlockList[i] = nearBlocks[i];
             }
 
-            for (int i = 0; i < randomBlockList.Length; i++)
+            for (var i = 0; i < randomBlockList.Length; i++)
             {
                 ShuffleBlock(rand.Next(8), rand.Next(8), ref randomBlockList);
             }
@@ -77,17 +70,20 @@ namespace SquareTerrain.Controllers
             if (distance < _maxLandSquareBoundSize && sourceLandBlock.BlockType.Equals(BlockTypesEnum.Types.Land))
             {
                 _visited[sourceLandBlock.X, sourceLandBlock.Y] = 1; // visited
-                double currentLandGenerationProbality = ProbabilityFunction(distance);
+                var currentLandGenerationProbality = ProbabilityFunction(distance);
 
                 MapBlock[] randomNearBlockList;
                 ShufflingNearBlock(sourceLandBlock.NearBlocks, out randomNearBlockList);
 
-                for(int i = 0; i<randomNearBlockList.Length; i++)
+                for (var i = 0; i < randomNearBlockList.Length; i++)
                 {
-                    if (randomNearBlockList[i] != null && _visited[randomNearBlockList[i].X, randomNearBlockList[i].Y] == 0 && rand.Next(100) < currentLandGenerationProbality * 100)
+                    if (randomNearBlockList[i] != null &&
+                        _visited[randomNearBlockList[i].X, randomNearBlockList[i].Y] == 0 &&
+                        rand.Next(100) < currentLandGenerationProbality*100)
                     {
                         randomNearBlockList[i].BlockType = BlockTypesEnum.Types.Land;
-                        PutNextLandBlocks(randomNearBlockList[i], rand, ++distance); // only land blocks can generate next land block
+                        PutNextLandBlocks(randomNearBlockList[i], rand, ++distance);
+                            // only land blocks can generate next land block
                     }
                 }
             }
@@ -97,7 +93,7 @@ namespace SquareTerrain.Controllers
         {
             foreach (var generatedLandBlock in _landSources)
             {
-                Random rand = new Random(DateTime.Now.Millisecond);
+                var rand = new Random(DateTime.Now.Millisecond);
                 _maxLandSquareBoundSize = rand.Next(MinMaxLandSize.X, MinMaxLandSize.Y);
 
                 PutNextLandBlocks(generatedLandBlock.Block, rand, 0);
@@ -106,12 +102,12 @@ namespace SquareTerrain.Controllers
 
         private void ChooseRandomLandSourcePoints()
         {
-            Random rand = new Random(DateTime.Now.Millisecond);
+            var rand = new Random(DateTime.Now.Millisecond);
 
-            for (int i = 0; i < LandSourcePointsDensity; i++)
+            for (var i = 0; i < LandSourcePointsDensity; i++)
             {
-                int x = rand.Next(TileMapGeneratorController.TileMapWidth);
-                int y = rand.Next(TileMapGeneratorController.TileMapHeight);
+                var x = rand.Next(TileMapGeneratorController.TileMapWidth);
+                var y = rand.Next(TileMapGeneratorController.TileMapHeight);
 
                 if (_landSources.Count <= 0)
                 {
@@ -120,7 +116,7 @@ namespace SquareTerrain.Controllers
                 }
                 else
                 {
-                    int iterationCount = TileMapGeneratorController.TileMapHeight *
+                    var iterationCount = TileMapGeneratorController.TileMapHeight*
                                          TileMapGeneratorController.TileMapWidth;
 
                     while (_landSources.Exists(item => item.Block.X == x) && iterationCount > 0)
