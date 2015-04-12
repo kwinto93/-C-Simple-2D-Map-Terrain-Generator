@@ -4,6 +4,6 @@ My own, 2D map generator, created using .Net and SFML (Simple and Fast Multimedi
 ![alt tag](https://cloud.githubusercontent.com/assets/4293290/7105492/42f06032-e11d-11e4-8b65-eb08beb04c22.PNG)
 
 Features:
-- simple GUI, providing access to the most important land generating algorithm variables (in progress)
+- simple GUI, providing access to the most important land generating algorithm variables
 - you can export the map of the solution to the *.png (in progress)
 - you can see the solution in the separate window
