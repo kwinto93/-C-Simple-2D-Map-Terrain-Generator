@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SFML.System;
 using SquareTerrain.Enums;
 using SquareTerrain.Models;
+using SquareTerrain.Utils;
 
 namespace SquareTerrain.Controllers
 {
@@ -11,57 +12,60 @@ namespace SquareTerrain.Controllers
         private readonly List<GeneratedLandBlock> _landSources;
         private readonly MapBlock[,] _map;
         private readonly int[,] _visited;
+
+        /// <summary>
+        /// Maximum radius of generated land from land source position
+        /// </summary>
         private int _maxLandSquareBoundSize;
 
-        public LandGeneratorController(ref MapBlock[,] map)
+        private LandGeneratorController(ref MapBlock[,] map)
         {
             _map = map;
             _landSources = new List<GeneratedLandBlock>();
             _visited = new int[TileMapGeneratorController.TileMapWidth, TileMapGeneratorController.TileMapHeight];
         }
 
-        public LandGeneratorController(ref MapBlock[,] map, float landSourcePointsDensity)
+        public LandGeneratorController(ref MapBlock[,] map, LandGeneratorArguments args)
             : this(ref map)
         {
-            LandSourcePointsDensity = landSourcePointsDensity;
-            //DistanceFromSourceLandBlockImpact = 4f;
-            DistanceFromSourceLandBlockImpact = 5f;
-            //LandGenerationPower = 1 / 2d;
-            LandGenerationPower = 1/8d;
-            //MinMaxLandSize = new Vector2i(20, 40);
-            MinMaxLandSize = new Vector2i(40, 300);
+            LandSourcePointsDensity = args.LandSourcePointsDensity;
+            DistanceFromSourceLandBlockImpact = args.DistanceFromSourceBlockImpact;
+            LandGenerationPower = args.LandGenerationPower;
+            MinMaxLandSize = new Vector2i(args.MinSize, args.MaxSize);
         }
 
+        /// <summary>
+        /// Number of land source points
+        /// </summary>
         public float LandSourcePointsDensity { get; set; }
+
+        /// <summary>
+        /// Higher value - lower probablity of land generation; compute using distance to land source point;
+        /// While generating, we are getting further and further from source land block and probability of putting new land block decreases with distance.
+        /// </summary>
         public float DistanceFromSourceLandBlockImpact { get; set; }
+        
+        /// <summary>
+        /// probability = 1/(distanceToSourceLandBlock)^LandGenerationPower
+        /// </summary>
         public double LandGenerationPower { get; set; }
+
         public Vector2i MinMaxLandSize { get; set; }
 
-        private double ProbabilityFunction(int distanceFromSource)
+        public void GenerateLand()
         {
-            return Math.Pow(1f/(distanceFromSource/100f*DistanceFromSourceLandBlockImpact + 1f), LandGenerationPower);
+            ChooseRandomLandSourcePoints();
+            GenerateLandFromLandSources();
         }
 
-        private void ShuffleBlock(int source, int destination, ref MapBlock[] randomBlockList)
+        private void GenerateLandFromLandSources()
         {
-            var tmp = randomBlockList[source];
-            randomBlockList[source] = randomBlockList[destination];
-            randomBlockList[destination] = tmp;
-        }
-
-        private void ShufflingNearBlock(List<MapBlock> nearBlocks, out MapBlock[] randomBlockList)
-        {
-            var rand = new Random(DateTime.Now.Millisecond);
-            randomBlockList = new MapBlock[8];
-
-            for (var i = 0; i < nearBlocks.Count; i++)
+            foreach (var generatedLandBlock in _landSources)
             {
-                randomBlockList[i] = nearBlocks[i];
-            }
+                var rand = new Random(DateTime.Now.Millisecond);
+                _maxLandSquareBoundSize = rand.Next(MinMaxLandSize.X, MinMaxLandSize.Y);
 
-            for (var i = 0; i < randomBlockList.Length; i++)
-            {
-                ShuffleBlock(rand.Next(8), rand.Next(8), ref randomBlockList);
+                PutNextLandBlocks(generatedLandBlock.Block, rand, 0);
             }
         }
 
@@ -83,21 +87,37 @@ namespace SquareTerrain.Controllers
                     {
                         randomNearBlockList[i].BlockType = BlockTypesEnum.Types.Land;
                         PutNextLandBlocks(randomNearBlockList[i], rand, ++distance);
-                            // only land blocks can generate next land block
                     }
                 }
             }
         }
 
-        private void GenerateLandFromLandSources()
+        private double ProbabilityFunction(int distanceFromSource)
         {
-            foreach (var generatedLandBlock in _landSources)
-            {
-                var rand = new Random(DateTime.Now.Millisecond);
-                _maxLandSquareBoundSize = rand.Next(MinMaxLandSize.X, MinMaxLandSize.Y);
+            return Math.Pow(1f / (distanceFromSource / 100f * DistanceFromSourceLandBlockImpact + 1f), LandGenerationPower);
+        }
 
-                PutNextLandBlocks(generatedLandBlock.Block, rand, 0);
+        private void ShufflingNearBlock(List<MapBlock> nearBlocks, out MapBlock[] randomBlockList)
+        {
+            var rand = new Random(DateTime.Now.Millisecond);
+            randomBlockList = new MapBlock[8];
+
+            for (var i = 0; i < nearBlocks.Count; i++)
+            {
+                randomBlockList[i] = nearBlocks[i];
             }
+
+            for (var i = 0; i < randomBlockList.Length; i++)
+            {
+                ShuffleBlock(rand.Next(8), rand.Next(8), ref randomBlockList);
+            }
+        }
+
+        private void ShuffleBlock(int source, int destination, ref MapBlock[] randomBlockList)
+        {
+            var tmp = randomBlockList[source];
+            randomBlockList[source] = randomBlockList[destination];
+            randomBlockList[destination] = tmp;
         }
 
         private void ChooseRandomLandSourcePoints()
@@ -139,12 +159,6 @@ namespace SquareTerrain.Controllers
                     }
                 }
             }
-        }
-
-        public void GenerateLand()
-        {
-            ChooseRandomLandSourcePoints();
-            GenerateLandFromLandSources();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using SFML.Graphics;
 using SFML.Window;
 using SquareTerrain.Controllers;
@@ -12,38 +13,12 @@ namespace SquareTerrain
 {
     class Program
     {
-        private static MapBlock[,] _tileMap;
-        private static RenderWindow _mainWindow;
-        private static DrawingTileMapController _drawingTileMapManager;
+        private static MainWindow _mainWindow;
 
-        public const int WINDOW_WIDTH = 800;
-        public const int WINDOW_HEIGHT = 600;
-
-        static void Main(string[] args)
+        private static void Main(String[] args)
         {
-            _tileMap = TileMapGeneratorController.GenerateTileMap();
-
-            LandGeneratorController landGenerator = new LandGeneratorController(ref _tileMap, 3);
-            landGenerator.GenerateLand();
-
-            _mainWindow = new RenderWindow(new VideoMode(800,600), "Square Tiles terrain generator");
-            _mainWindow.Closed += mainWindow_Closed;
-
-            _drawingTileMapManager = new DrawingTileMapController(ref _tileMap);
-
-            while (_mainWindow.IsOpen)
-            {
-                _mainWindow.DispatchEvents();
-
-                _mainWindow.Clear(Color.Black);
-                _mainWindow.Draw(_drawingTileMapManager);
-                _mainWindow.Display();
-            }
-        }
-
-        static void mainWindow_Closed(object sender, EventArgs e)
-        {
-            _mainWindow.Close();
+            _mainWindow = new MainWindow();
+            Application.Run(_mainWindow);
         }
     }
 }

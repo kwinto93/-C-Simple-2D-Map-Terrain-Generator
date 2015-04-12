@@ -10,8 +10,8 @@ namespace SquareTerrain.Controllers
     public static class TileMapGeneratorController
     {
         public const int SquareBlockSize = 2;
-        public const int TileMapWidth = Program.WINDOW_WIDTH / SquareBlockSize;
-        public const int TileMapHeight = Program.WINDOW_HEIGHT / SquareBlockSize;
+        public const int TileMapWidth = MapWindow.WINDOW_WIDTH / SquareBlockSize;
+        public const int TileMapHeight = MapWindow.WINDOW_HEIGHT / SquareBlockSize;
 
         private static MapBlock ReturnBlockOrNull(int i, int j, ref MapBlock[,] map)
         {
