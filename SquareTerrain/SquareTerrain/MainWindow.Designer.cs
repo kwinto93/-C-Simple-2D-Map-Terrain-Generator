@@ -39,6 +39,9 @@
             this.groundMaxSizeTextBox = new System.Windows.Forms.TextBox();
             this.buttonStart = new System.Windows.Forms.Button();
             this.buttonSave = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.seedTextBox = new System.Windows.Forms.TextBox();
+            this.buttonRandomSeed = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -142,11 +145,40 @@
             this.buttonSave.UseVisualStyleBackColor = true;
             this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(214, 119);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(38, 13);
+            this.label5.TabIndex = 11;
+            this.label5.Text = "Seed: ";
+            // 
+            // seedTextBox
+            // 
+            this.seedTextBox.Location = new System.Drawing.Point(258, 116);
+            this.seedTextBox.Name = "seedTextBox";
+            this.seedTextBox.Size = new System.Drawing.Size(100, 20);
+            this.seedTextBox.TabIndex = 12;
+            // 
+            // buttonRandomSeed
+            // 
+            this.buttonRandomSeed.Location = new System.Drawing.Point(365, 116);
+            this.buttonRandomSeed.Name = "buttonRandomSeed";
+            this.buttonRandomSeed.Size = new System.Drawing.Size(99, 21);
+            this.buttonRandomSeed.TabIndex = 13;
+            this.buttonRandomSeed.Text = "Random";
+            this.buttonRandomSeed.UseVisualStyleBackColor = true;
+            this.buttonRandomSeed.Click += new System.EventHandler(this.buttonRandomSeed_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(484, 121);
+            this.ClientSize = new System.Drawing.Size(484, 141);
+            this.Controls.Add(this.buttonRandomSeed);
+            this.Controls.Add(this.seedTextBox);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.buttonSave);
             this.Controls.Add(this.buttonStart);
             this.Controls.Add(this.groundMaxSizeTextBox);
@@ -158,8 +190,8 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.MaximumSize = new System.Drawing.Size(500, 160);
-            this.MinimumSize = new System.Drawing.Size(500, 160);
+            this.MaximumSize = new System.Drawing.Size(500, 180);
+            this.MinimumSize = new System.Drawing.Size(500, 180);
             this.Name = "MainWindow";
             this.Text = "2D Map Land Generating Alpha 0.1";
             this.ResumeLayout(false);
@@ -180,5 +212,8 @@
         private System.Windows.Forms.TextBox groundMaxSizeTextBox;
         private System.Windows.Forms.Button buttonStart;
         private System.Windows.Forms.Button buttonSave;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox seedTextBox;
+        private System.Windows.Forms.Button buttonRandomSeed;
     }
 }

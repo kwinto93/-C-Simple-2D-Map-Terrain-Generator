@@ -8,24 +8,24 @@ namespace SquareTerrain
 {
     public partial class MainWindow : Form
     {
-        private readonly List<TextBox> _textBoxes = new List<TextBox>();
+        private readonly List<TextBox> _numericTextBoxes = new List<TextBox>();
 
         public MainWindow()
         {
             InitializeComponent();
 
-            InitTextBoxesList();
+            InitNumericTextBoxesList();
         }
 
-        private void InitTextBoxesList()
+        private void InitNumericTextBoxesList()
         {
-            _textBoxes.Clear();
+            _numericTextBoxes.Clear();
 
-            _textBoxes.Add(distanceFromSourceTextBox);
-            _textBoxes.Add(landGenerationPowerTextBox);
-            _textBoxes.Add(pointsDensityTextBox);
-            _textBoxes.Add(groundMinSizeTextBox);
-            _textBoxes.Add(groundMaxSizeTextBox);
+            _numericTextBoxes.Add(distanceFromSourceTextBox);
+            _numericTextBoxes.Add(landGenerationPowerTextBox);
+            _numericTextBoxes.Add(pointsDensityTextBox);
+            _numericTextBoxes.Add(groundMinSizeTextBox);
+            _numericTextBoxes.Add(groundMaxSizeTextBox);
         }
 
         private void buttonStart_Click(object sender, EventArgs e)
@@ -41,14 +41,27 @@ namespace SquareTerrain
                     LandSourcePointsDensity = float.Parse(pointsDensityTextBox.Text, CultureInfo.InvariantCulture),
                     MaxSize = Int32.Parse(groundMaxSizeTextBox.Text),
                     MinSize = Int32.Parse(groundMaxSizeTextBox.Text)
-                });
+                },
+                    String.IsNullOrEmpty(seedTextBox.Text)
+                        ? DateTime.Now.Millisecond
+                        : ConvertStringSeedToInt(seedTextBox.Text));
             else
                 MessageBox.Show("Some fields are empty!");
         }
 
+        private int ConvertStringSeedToInt(string seedStr)
+        {
+            var tmp = 0;
+            for (var i = 0; i < seedStr.Length; i++)
+            {
+                tmp += seedStr[i];
+            }
+            return tmp;
+        }
+
         private bool AreTextBoxesValid()
         {
-            foreach (var textBox in _textBoxes)
+            foreach (var textBox in _numericTextBoxes)
                 if (String.IsNullOrEmpty(textBox.Text))
                     return false;
 
@@ -75,27 +88,33 @@ namespace SquareTerrain
 
         private void distanceFromSourceTextBox_KeyUp(object sender, KeyEventArgs e)
         {
-            ShowError((TextBox)sender);
+            ShowError((TextBox) sender);
         }
 
         private void pointsDensityTextBox_KeyUp(object sender, KeyEventArgs e)
         {
-            ShowError((TextBox)sender);
+            ShowError((TextBox) sender);
         }
 
         private void landGenerationPowerTextBox_KeyUp(object sender, KeyEventArgs e)
         {
-            ShowError((TextBox)sender);
+            ShowError((TextBox) sender);
         }
 
         private void groundMinSizeTextBox_KeyUp(object sender, KeyEventArgs e)
         {
-            ShowError((TextBox)sender);
+            ShowError((TextBox) sender);
         }
 
         private void groundMaxSizeTextBox_KeyUp(object sender, KeyEventArgs e)
         {
-            ShowError((TextBox)sender);
+            ShowError((TextBox) sender);
+        }
+
+        private void buttonRandomSeed_Click(object sender, EventArgs e)
+        {
+            var rand = new Random();
+            seedTextBox.Text = rand.Next().ToString();
         }
     }
 }

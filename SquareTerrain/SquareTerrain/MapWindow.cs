@@ -15,11 +15,11 @@ namespace SquareTerrain
         private RenderWindow _mainWindow;
         private MapBlock[,] _tileMap;
 
-        public void ShowWindow(LandGeneratorArguments args)
+        public void ShowWindow(LandGeneratorArguments args, int seed)
         {
             _tileMap = TileMapGeneratorController.GenerateTileMap();
 
-            var landGenerator = new LandGeneratorController(ref _tileMap, args);
+            var landGenerator = new LandGeneratorController(ref _tileMap, args, seed);
             landGenerator.GenerateLand();
 
             _mainWindow = new RenderWindow(new VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Square Tiles terrain generator");
